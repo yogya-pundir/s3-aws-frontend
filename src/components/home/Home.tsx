@@ -1,8 +1,8 @@
 import { ChangeEvent, useState } from "react";
-
+import './Home.css';
 const Home = () => {
     const [img, setImg] = useState<File>();
-
+    const [s3Img, sets3Img] = useState<string>();
     const changeHandler = (e: ChangeEvent<HTMLInputElement>) => {
         const fileList = e.target.files;
 
@@ -18,10 +18,18 @@ const Home = () => {
         if (img) {
             const formData = new FormData();
             formData.append("image", img, img.name);
-            const temp = await fetch("http://localhost:8000/uploadimg",{
+            const apiResp = await fetch("http://localhost:8000/uploadimg",{
                 method:'POST',
                 body:formData
             })
+            if(apiResp){
+
+                sets3Img("")
+
+            }
+            const result = await apiResp.json()
+            console.log(result);
+            sets3Img(result.imgUrl)
         }
 
     }
@@ -30,6 +38,12 @@ const Home = () => {
         <div>
             <input type="file" onChange={changeHandler}></input>
             <button onClick={submitHandler}>submit</button>
+
+            {s3Img && (
+                <img className="image-s3" src={s3Img}></img>
+            )
+            }
+            
         </div>
     )
 }
